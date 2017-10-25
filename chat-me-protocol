@@ -1,0 +1,18 @@
+Voto
+remetente: <uuid> -- uuid da instância que envia a mensagem
+tipo: 0 -- tipo da mensagem
+voto_instancia: <uuid> -- uuid da instância votada
+voto_distribuidor: [0|1] -- 1 somente se instância do voto é o distribuidor atual
+
+Eleição
+- instância envia voto em si mesma
+- aguarda até 5 segundos por outros votos, se não receber nada continua esperando por votação
+- ao receber um voto de um outro remetente, verifica se o voto_distribuidor é 1, se for 1 não precisa comparar uuid do voto_instancia, simplesmente envia adiantei
+
+SE voto_distribuidor == 0:
+	SE voto_instancia < uuid local:
+		enviar voto na instância local
+	SENÃO
+		enviar adiante voto recebido
+
+- aguardar 3 segundos após último voto recebido, o distribuidor será o uuid constante no último voto recebido
