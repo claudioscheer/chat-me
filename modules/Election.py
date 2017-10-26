@@ -30,12 +30,20 @@ class Election:
             try:
                 data = sockets.socket_receiver.recv(1024)
                 vote_received = json.loads(data)
-                if vote_received["voto_distribuidor"] == 0:
-                    print vote_received
-                else:
+                voto_instancia = vote_received["voto_instancia"]
+                if voto_instancia == local_uuid:
+                    continue
+                if vote_received["voto_distribuidor"] == 1:
                     sockets.send_message(self.get_vote(
-                        local_uuid, vote_received.voto_instancia), ip)
-                    break
+                        local_uuid, voto_instancia), ip)
+                else:
+                    if voto_instancia < local_uuid:
+                        sockets.send_message(self.get_vote(
+                            local_uuid, local_uuid), ip)
+                    else:
+                        sockets.send_message(self.get_vote(
+                            local_uuid, voto_instancia), ip)
+                break
             except socket.timeout:
                 print "No vote received."
         sockets.socket_receiver.settimeout(None)
